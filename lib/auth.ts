@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { getPool } from "./db";
 
-export async function authenticateWorkspaceRequest(req: Request) {
+export async function authenticateWorkspaceRequest(req: Request): Promise<{ id: string; name: string }> {
   const header = req.headers.get("authorization");
   if (!header?.startsWith("Bearer ")) throw new Error("UNAUTHORIZED");
   const token = header.slice(7).trim();
