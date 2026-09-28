@@ -42,6 +42,8 @@ export async function executeAiTask<T>(task:TaskType,inputData:any,agentRunId?:s
  const input=task==="offer_analysis"?String(inputData.text??""):String(inputData.replyText??"");
  const started=Date.now();
  let raw="";
+ let status:"success"|"error"="success";
+ let errorMessage:string|undefined;
  try {
   const response=await new HfInference(token).chatCompletion({
    model:cfg.model,
@@ -51,10 +53,11 @@ export async function executeAiTask<T>(task:TaskType,inputData:any,agentRunId?:s
   raw=String(response.choices[0]?.message?.content??"");
   return cfg.schema.parse(jsonFrom(raw)) as T;
  } catch(e) {
-  await logRun(task,cfg.model,input,started,"error",e instanceof Error?e.message:String(e),agentRunId,raw);
-  throw new Error(`[HF_AI_ROUTER_FAILURE] ${task}: ${e instanceof Error?e.message:String(e)}`);
+  status="error";
+  errorMessage=e instanceof Error?e.message:String(e);
+  throw new Error(`[HF_AI_ROUTER_FAILURE] ${task}: ${errorMessage}`);
  } finally {
-  await logRun(task,cfg.model,input,started,"success",undefined,agentRunId,raw);
+  await logRun(task,cfg.model,input,started,status,errorMessage,agentRunId,raw);
  }
 }
 
