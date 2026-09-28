@@ -62,8 +62,8 @@ export async function executeAiTask<T>(task:TaskType,inputData:any,agentRunId?:s
 }
 
 export async function analyzeOffer(text:string) {
- return executeAiTask("offer_analysis",{text});
+ return executeAiTask<z.infer<typeof OfferAnalysisSchema>>("offer_analysis",{text});
 }
 export async function classifyReply(text:string) {
- return executeAiTask("reply_classification",{replyText:text});
+ return executeAiTask<z.infer<typeof ReplyClassificationSchema>>("reply_classification",{replyText:text});
 }
